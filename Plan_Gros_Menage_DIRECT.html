@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Plan Gros Ménage — Local</title>
+<style>
+:root {
+  --bg:#f4f1e9; --card:#fffdf8; --ink:#24231f; --muted:#716d64; --line:#ddd7cb;
+  --green:#315f4d; --green-soft:#e1ebe5; --amber:#9b6500; --amber-soft:#f7e9ca;
+  --red:#a1463a; --blue:#45657a; --shadow:0 5px 20px rgba(40,35,25,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+body{min-height:100dvh;padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;
+ padding:calc(12px + env(safe-area-inset-top)) 15px 10px;background:color-mix(in srgb,var(--bg) 94%,transparent);
+ backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.over{font-size:10px;font-weight:900;letter-spacing:.12em;color:var(--muted)}
+h1{margin:2px 0 0;font-size:25px} h2{margin:0 0 10px} p{line-height:1.45}
+main{max-width:820px;margin:auto;padding:10px}
+.view{display:none} .view.active{display:block} .hidden{display:none!important}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.muted{color:var(--muted);font-size:13px}
+.btn{min-height:47px;border:1px solid var(--line);border-radius:13px;padding:10px 13px;background:white;font-weight:800}
+.primary{background:var(--green);border-color:var(--green);color:white}
+.wait{background:var(--amber-soft);border-color:#e8ca88;color:#684400}
+.ghost{background:white}
+.danger{background:white;color:var(--red);border-color:#ddb3ad}
+.small{min-height:36px;padding:7px 9px;font-size:12px}
+.badge{border:0;border-radius:999px;background:var(--amber-soft);color:#6d4800;padding:8px 10px;font-weight:850}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bar{height:9px;background:#e6e0d5;border-radius:99px;overflow:hidden;margin-top:9px}
+.bar i{display:block;height:100%;width:0;background:var(--green);border-radius:99px;transition:.2s}
+.bar.thin{height:6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 9px;border-radius:999px;background:#ece7dc;font-size:12px;font-weight:800}
+.chip.green{background:var(--green-soft);color:#254a3b}
+.task h2{font-size:27px;line-height:1.18;margin:18px 0 20px;overflow-wrap:anywhere}
+.actions{display:grid;grid-template-columns:1.3fr 1fr;gap:8px}
+.navactions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.jalonbox{border-top:1px solid var(--line);padding-top:14px;margin-top:16px;font-size:13px}
+.timerstrip{display:flex;gap:7px;overflow-x:auto;margin-top:10px;padding-bottom:2px}
+.timerpill{flex:none;background:#272824;color:white;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}
+.notice{background:#edf4f0;border:1px solid #bed1c7;border-radius:15px;padding:11px 13px;margin-bottom:10px;font-size:13px}
+.activation{background:#f0ece3;border:1px dashed #beb6a8;border-radius:16px;padding:14px;margin-bottom:10px}
+.activation h3{margin:0 0 8px}
+.return,.planitem,.sasitem{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:8px}
+.return.ready{border-color:#86ad99;background:#f5fbf7}
+.meta{font-size:12px;color:var(--muted);margin-top:5px}
+.returnactions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.filters{position:sticky;top:76px;z-index:10}
+.filters input,.filters select,dialog input,dialog select,dialog textarea,.settings select{width:100%;border:1px solid var(--line);background:white;border-radius:11px;padding:11px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.filters .grid2{margin-top:8px}
+.planrow{display:flex;align-items:flex-start;gap:10px}
+.status{width:36px;height:36px;border:0;border-radius:10px;flex:none;font-weight:900}
+.s1{background:var(--green-soft);color:#254a3b} .s0{background:#ece9e2} .sm1{background:var(--amber-soft);color:#6d4800}
+.planbody{flex:1} .plantitle{font-weight:780;line-height:1.32}
+.planbuttons{display:flex;gap:4px} .icon{width:34px;height:34px;border:1px solid var(--line);background:white;border-radius:9px}
+.fab{position:fixed;right:17px;bottom:calc(90px + env(safe-area-inset-bottom));z-index:15;width:58px;height:58px;border:0;border-radius:50%;background:var(--green);color:#fff;font-size:30px;box-shadow:0 9px 25px rgba(49,95,77,.28)}
+.sashead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start} .sashead h3{margin:2px 0 0}
+.meter{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:10px}
+.meter button{border:1px solid var(--line);background:white;border-radius:9px;padding:8px 4px;font-size:11px}
+.meter button.active{background:var(--green-soft);border-color:#abc5b8;font-weight:900}
+.meter button.warn.active{background:var(--amber-soft);border-color:#e0c179}
+.subs{list-style:none;padding:0;margin:10px 0 0}
+.subs li{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:7px 0;font-size:13px}
+.rules{margin:0;padding-left:20px} .rules li{margin:7px 0;line-height:1.35}
+.stack{display:flex;flex-direction:column;gap:9px} .stack h2{margin-bottom:0}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);
+ padding:6px 5px calc(6px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--card) 96%,transparent);
+ backdrop-filter:blur(20px);border-top:1px solid var(--line)}
+.tab{border:0;background:transparent;border-radius:12px;color:var(--muted);min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tab span{font-size:18px} .tab small{font-size:10px;font-weight:800} .tab.active{background:var(--green-soft);color:var(--green)}
+dialog{width:min(92vw,520px);border:1px solid var(--line);border-radius:18px;background:var(--card);padding:19px;box-shadow:0 22px 80px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(0,0,0,.3);backdrop-filter:blur(3px)} dialog form{display:flex;flex-direction:column;gap:12px}
+dialog label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:750;color:var(--muted)} dialog h2{margin:0}
+.preset{display:flex;gap:6px;flex-wrap:wrap} .preset button{border:1px solid var(--line);background:white;border-radius:9px;padding:7px 9px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));z-index:99;background:#24231f;color:white;border-radius:999px;padding:9px 13px;font-size:13px;opacity:0;pointer-events:none;transition:.2s}
+.toast.show{opacity:1}
+@media(max-width:520px){main{padding:8px}.task h2{font-size:24px}.actions{grid-template-columns:1fr}.filters{top:73px}}
+@media(prefers-color-scheme:dark){
+ :root{--bg:#171816;--card:#20211f;--ink:#f2efe8;--muted:#aaa69d;--line:#3a3b36;--green:#82b49a;--green-soft:#293c32;--amber-soft:#564628;--shadow:none}
+ header,.tabs{background:rgba(23,24,22,.95)} .ghost,.danger,.filters input,.filters select,dialog input,dialog select,dialog textarea,.settings select,.icon,.meter button,.preset button{background:#292a27;color:var(--ink)}
+ .s0,.chip{background:#33342f} .notice{background:#25362e;border-color:#365244} .activation{background:#252520;border-color:#4b493f}
+}
+</style>
+</head>
+<body>
+<header>
+ <div><div class="over">PLAN GROS MÉNAGE · LOCAL</div><h1 id="title">Exécuter</h1></div>
+ <button id="returnBadge" class="badge hidden">0 retour</button>
+</header>
+
+<main>
+<section id="view-focus" class="view active">
+ <div class="notice">Plan intégré : <b>145 tâches</b> issues du fichier fourni. Aucun import n’est nécessaire.</div>
+ <div class="card">
+  <div class="row"><strong id="globalTxt"></strong><span id="waitingTxt" class="muted"></span></div>
+  <div class="bar"><i id="globalBar"></i></div>
+  <div id="timerStrip" class="timerstrip hidden"></div>
+ </div>
+ <div id="activationCard" class="activation hidden">
+   <div class="over">PROCHAINE ÉTAPE À ACTIVER</div>
+   <h3 id="activationText"></h3>
+   <button id="activateBtn" class="btn primary">Activer et continuer</button>
+ </div>
+ <article id="taskCard" class="card task">
+  <div class="chips"><span id="ord" class="chip"></span><span id="jal" class="chip"></span><span id="space" class="chip"></span><span id="kind" class="chip green hidden"></span></div>
+  <h2 id="taskText"></h2>
+  <div id="taskWaitInfo" class="notice hidden"></div>
+  <div class="actions"><button id="done" class="btn primary">✓ Fait</button><button id="wait" class="btn wait">⏳ Mettre en attente</button></div>
+  <div class="navactions"><button id="prev" class="btn ghost">← Précédente</button><button id="next" class="btn ghost">Suivante →</button></div>
+  <div class="jalonbox"><div class="row"><span id="jalonName"></span><span id="jalonStat"></span></div><div class="bar thin"><i id="jalonBar"></i></div></div>
+ </article>
+ <div id="finishedCard" class="card hidden"><h2>Plan terminé</h2><p>Toutes les tâches sont cochées.</p></div>
+</section>
+
+<section id="view-returns" class="view">
+ <div class="card"><h2>Retours</h2><p class="muted">Uniquement les tâches que tu as explicitement mises en attente dans l’app. Les tâches marquées Waiting dans le classeur mais pas encore activées ne polluent pas cette vue.</p></div>
+ <div id="returns"></div>
+</section>
+
+<section id="view-plan" class="view">
+ <div class="card filters"><input id="search" type="search" placeholder="Rechercher une tâche…"><div class="grid2"><select id="spaceFilter"><option value="">Tous espaces</option></select><select id="statusFilter"><option value="">Tous états</option><option value="0">À faire</option><option value="-1">Waiting</option><option value="1">Fait</option></select></div></div>
+ <div id="plan"></div><button id="add" class="fab">＋</button>
+</section>
+
+<section id="view-sas" class="view">
+ <div class="card"><h2>SAS / Parkings</h2><p class="muted">Niveaux de remplissage indépendants des tâches. Les sous-parkings restent bornés : un contenant maximum.</p></div>
+ <div id="sas"></div>
+</section>
+
+<section id="view-settings" class="view">
+ <div class="card"><h2>Règles générales</h2><ul id="rules" class="rules"></ul></div>
+ <div class="card stack settings"><h2>Données</h2>
+   <button id="exportJson" class="btn ghost">Exporter une sauvegarde JSON</button>
+   <button id="exportCsv" class="btn ghost">Exporter les tâches CSV</button>
+   <label class="btn ghost" style="position:relative;overflow:hidden;text-align:center">Importer une sauvegarde JSON<input id="importJson" type="file" accept=".json" style="position:absolute;inset:0;opacity:0"></label>
+ </div>
+ <div class="card stack settings"><h2>Plan</h2>
+   <button id="resetEmbedded" class="btn ghost">Revenir au plan intégré du classeur</button>
+   <button id="resetStatuses" class="btn danger">Remettre toutes les coches à l’état initial du classeur</button>
+ </div>
+ <div class="card"><h2>Stockage local</h2><p id="storageInfo" class="muted"></p></div>
+</section>
+</main>
+
+<nav class="tabs">
+<button class="tab active" data-v="focus"><span>▶</span><small>Exécuter</small></button>
+<button class="tab" data-v="returns"><span>↩</span><small>Retours</small></button>
+<button class="tab" data-v="plan"><span>☷</span><small>Plan</small></button>
+<button class="tab" data-v="sas"><span>▦</span><small>SAS</small></button>
+<button class="tab" data-v="settings"><span>⚙</span><small>Réglages</small></button>
+</nav>
+
+<dialog id="waitDialog"><form method="dialog">
+ <h2>Mettre en attente</h2><div id="waitLabel" class="muted"></div>
+ <label>Type<select id="waitType"><option value="timer">Timer / cycle</option><option value="condition">Condition manuelle</option><option value="later">À reprendre plus tard</option></select></label>
+ <div id="timerFields"><label>Durée en minutes<input id="minutes" type="number" min="1" max="1440" inputmode="numeric"></label><div id="presets" class="preset"></div></div>
+ <label>Note / condition<input id="waitNote" placeholder="Ex. quand le lave-vaisselle est fini"></label>
+ <div class="grid2"><button value="cancel" class="btn ghost">Annuler</button><button id="confirmWait" value="default" class="btn primary">Valider</button></div>
+</form></dialog>
+
+<dialog id="editDialog"><form method="dialog">
+ <h2 id="editTitle">Modifier</h2><input id="editId" type="hidden">
+ <label>Ordre<input id="editOrder" type="number" min="1"></label><label>Jalon<input id="editJalon"></label><label>Espace<input id="editSpace"></label>
+ <label>État<select id="editStatus"><option value="0">À faire</option><option value="-1">Waiting</option><option value="1">Fait</option></select></label>
+ <label>Tâche<textarea id="editText" rows="4"></textarea></label>
+ <div class="grid2"><button value="cancel" class="btn ghost">Annuler</button><button id="saveEdit" value="default" class="btn primary">Enregistrer</button></div>
+</form></dialog>
+
+<div id="toast" class="toast"></div>
+<script id="embedded-data" type="application/json">{"source": "Plan Gros Ménage.xlsx", "tasks": [{"ordre": 1, "jalon": 0, "espace": "Studio", "coche": 1, "tache": "Mettre chaussures + cheveux attachés + eau à portée"}, {"ordre": 2, "jalon": 0, "espace": "Studio", "coche": 1, "tache": "Aérer 5–10 min"}, {"ordre": 3, "jalon": 0, "espace": "Studio", "coche": 1, "tache": "Délimiter le SAS (≈ 1 m²)"}, {"ordre": 4, "jalon": 0, "espace": "Studio", "coche": 0, "tache": "préparer kit nettoyage : gants, chiffon, sprays, sacs éponge, raclette + sacs poubelle, sopalin"}, {"ordre": 5, "jalon": 0, "espace": "Studio", "coche": 0, "tache": "Installer au bord du SAS : Déchets / Recyclage / Lavomatique / À vendre / RAFL / vaisselle"}, {"ordre": 6, "jalon": 0, "espace": "Studio", "coche": -1, "tache": "Préparer timers téléphone : 15 min / 30 min / 60+ min"}, {"ordre": 7, "jalon": 3, "espace": "Cuisine", "coche": 1, "tache": "Vider Lave-vaisselle si besoin"}, {"ordre": 8, "jalon": 3, "espace": "Cuisine", "coche": 1, "tache": "Remplir et lancer un premier cycle de lave vaisselle"}, {"ordre": 9, "jalon": 7, "espace": "Circulation", "coche": 1, "tache": "(Entrée→cuisine) Cycle 1 : 10 objets → dispatch #1"}, {"ordre": 10, "jalon": 7, "espace": "Circulation", "coche": 1, "tache": "(Entrée→cuisine) Cycle 1 : 10 objets → dispatch #2"}, {"ordre": 11, "jalon": 7, "espace": "Circulation", "coche": 1, "tache": "(Entrée→cuisine) Cycle 1 : 10 objets → dispatch #3"}, {"ordre": 12, "jalon": 7, "espace": "Circulation", "coche": 1, "tache": "(Entrée→cuisine) Cycle 1 : 10 objets → dispatch #4"}, {"ordre": 13, "jalon": 7, "espace": "Circulation", "coche": 0, "tache": "(Entrée→cuisine) Cycle 1 : 10 objets → dispatch #5"}, {"ordre": 14, "jalon": 7, "espace": "Circulation", "coche": 0, "tache": "(Entrée→cuisine) Cycle 1 : 10 objets → dispatch #6"}, {"ordre": 15, "jalon": 7, "espace": "Circulation", "coche": 0, "tache": "(Entrée→cuisine) Passage praticable"}, {"ordre": 16, "jalon": 1, "espace": "Sorties", "coche": 1, "tache": "Sortir Poubelles + Trier Rafl (3min)  #1"}, {"ordre": 17, "jalon": 1, "espace": "Sorties", "coche": 1, "tache": "Remettre sac poubelle neuf dans la poubelle"}, {"ordre": 18, "jalon": 7, "espace": "Circulation", "coche": 0, "tache": "(Entrée→lit) Cycle 1 : 10 objets → dispatch"}, {"ordre": 19, "jalon": 7, "espace": "Circulation", "coche": -1, "tache": "(Entrée→lit) Cycle 2 : 10 objets → dispatch"}, {"ordre": 20, "jalon": 7, "espace": "Circulation", "coche": -1, "tache": "(Entrée→lit) Cycle 3 : 10 objets → dispatch"}, {"ordre": 21, "jalon": 7, "espace": "Circulation", "coche": -1, "tache": "(Entrée→lit) Cycle 4 : 10 objets → dispatch"}, {"ordre": 22, "jalon": 7, "espace": "Circulation", "coche": -1, "tache": "(Entrée→lit) Cycle 5 : 10 objets → dispatch"}, {"ordre": 23, "jalon": 7, "espace": "Circulation", "coche": -1, "tache": "(Entrée→lit) Cycle 6 : 10 objets → dispatch"}, {"ordre": 24, "jalon": 7, "espace": "Circulation", "coche": -1, "tache": "(Entrée→lit) Passage praticable"}, {"ordre": 25, "jalon": 7, "espace": "Salle de bain", "coche": -1, "tache": "(Accès SDB) Dégager la porte (ouvrir/fermer)"}, {"ordre": 26, "jalon": 1, "espace": "Sorties", "coche": -1, "tache": "Sortir Poubelles + Trier Rafl (3min)  #2"}, {"ordre": 27, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—lave-vaisselle) Si vaisselle propre dedans : vider/ranger (libérer la capacité)"}, {"ordre": 28, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—évier) Vider l’évier (vaisselle en pile)"}, {"ordre": 29, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—évier) Mettre en trempage ce qui colle (eau chaude + liquide vaisselle)"}, {"ordre": 30, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "Timer 30 min “trempage”"}, {"ordre": 31, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "Créer sous-parkings Cuisine : Aliments / Vaisselle / Appareils (1 bac/sac max chacun)"}, {"ordre": 32, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—Mange-Debout) Cycle 1 : 10 objets du plan → dispatch"}, {"ordre": 33, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—plan 1) Cycle 1 : 10 objets du plan → dispatch"}, {"ordre": 34, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—plan 2) Cycle 1 : 10 objets du plan → dispatch"}, {"ordre": 35, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—Mange-Debout) Cycle 2 : 10 objets du plan → dispatch"}, {"ordre": 36, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—plan 1) Cycle 2 : 10 objets du plan → dispatch"}, {"ordre": 37, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—plan 2) Cycle 2 : 10 objets du plan → dispatch"}, {"ordre": 38, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "Vider panier « parking Cuisine »"}, {"ordre": 39, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—plaques/crédence) Appliquer dégraissant si besoin"}, {"ordre": 40, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "Timer 15 min “dégraissant”"}, {"ordre": 41, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—plan) Essuyer plan de travail (zone sûre)"}, {"ordre": 42, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "Vider Lave-vaisselle + ranger vaiselle"}, {"ordre": 43, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—lave-vaisselle) Charger LV avec la vaisselle du plan/évier (sans perfection)"}, {"ordre": 44, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—lave-vaisselle) Ajouter pastille/produit + lancer programme éco/long"}, {"ordre": 45, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "Frigo : Vider / Nettoyer / Ranger"}, {"ordre": 46, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "Retour timer “dégraissant” : essuyer/rincer"}, {"ordre": 47, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "Retour timer “trempage” : frotter vite + rincer (minimum vital)"}, {"ordre": 48, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine) Évier dégagé + rincé"}, {"ordre": 49, "jalon": 1, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine) Jeter périmés/emballages/vides (dispatch direct)"}, {"ordre": 50, "jalon": 8, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine) Regrouper épicerie/consommables en 1 endroit (sans rangement fin)"}, {"ordre": 51, "jalon": 1, "espace": "Sorties", "coche": -1, "tache": "Sortir Poubelles + Trier Rafl (3min)  #3"}, {"ordre": 52, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "(Lit—prérequis sous-lit) Enlever tout ce qui est sur le lit → dispatch"}, {"ordre": 53, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "Retirer draps + housse + taies"}, {"ordre": 54, "jalon": 2, "espace": "Chambre", "coche": -1, "tache": "Mettre linge de lit en sac Lavomatique (fermé)"}, {"ordre": 55, "jalon": 2, "espace": "Sorties", "coche": -1, "tache": "(Voiture) Descendre ce sac Lavomatique dans la voiture (tampon)"}, {"ordre": 56, "jalon": 2, "espace": "Linge", "coche": -1, "tache": "(Linge général) Regrouper le linge visible en 1 tas"}, {"ordre": 57, "jalon": 2, "espace": "Linge", "coche": -1, "tache": "Trier : Propre / Sale Lavomatique / Tissus couture (à laver)"}, {"ordre": 58, "jalon": 2, "espace": "Linge", "coche": -1, "tache": "Mettre Sale en sac Lavomatique (fermé)"}, {"ordre": 59, "jalon": 2, "espace": "Linge", "coche": -1, "tache": "Mettre Tissus couture en sac Lavomatique (fermé)"}, {"ordre": 60, "jalon": 2, "espace": "Sorties", "coche": -1, "tache": "(Voiture) Descendre les sacs Lavomatique dans la voiture (tampon)"}, {"ordre": 61, "jalon": 2, "espace": "Linge", "coche": -1, "tache": "Mettre le Propre en 1–2 piles compactes (pas de pliage fin)"}, {"ordre": 62, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "(Sous le lit) Soulever le matelas (position stable)"}, {"ordre": 63, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "(Sous le lit) Cycle 1 : 10 objets → dispatch"}, {"ordre": 64, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "(Sous le lit) Cycle 2 : 10 objets → dispatch"}, {"ordre": 65, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "Aspirer/essuyer vite sous le lit"}, {"ordre": 66, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "Choisir usage unique sous le lit (catégorie stable)"}, {"ordre": 67, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "Remettre uniquement cette catégorie"}, {"ordre": 68, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "Reposer le matelas"}, {"ordre": 69, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—lave-vaisselle) Si cycle terminé : vider, ranger, nouveau cycle au besoin"}, {"ordre": 70, "jalon": 10, "espace": "Linge", "coche": -1, "tache": "(Lit) Poser maintenant la pile “linge propre” sur le lit (tampon provisoire)"}, {"ordre": 71, "jalon": 13, "espace": "Entrée", "coche": -1, "tache": "(EC #2:sous-bibliothèque) Cycle 1 : 10 objets → dispatch"}, {"ordre": 72, "jalon": 13, "espace": "Entrée", "coche": -1, "tache": "(EC #2:sous-bibliothèque) Cycle 2 : 10 objets → dispatch"}, {"ordre": 73, "jalon": 13, "espace": "Entrée", "coche": -1, "tache": "Essuyer vite EC #2:sous-bibliothèque"}, {"ordre": 74, "jalon": 13, "espace": "Entrée", "coche": -1, "tache": "Choisir usage unique"}, {"ordre": 75, "jalon": 13, "espace": "Entrée", "coche": -1, "tache": "Remplir uniquement avec cette catégorie"}, {"ordre": 76, "jalon": 13, "espace": "Entrée", "coche": -1, "tache": "Mettre en place zone prêt-à-sortir (clé/sac/peigne) + bornage chaussures/manteaux"}, {"ordre": 77, "jalon": 10, "espace": "Linge", "coche": -1, "tache": "Vider Penderie sur le lit"}, {"ordre": 78, "jalon": 13, "espace": "Entrée", "coche": -1, "tache": "Créer espace Entrée : Prêt à sortir (clef, sac – Manteaux, chaussures)"}, {"ordre": 79, "jalon": 10, "espace": "Linge", "coche": -1, "tache": "Trier linge propre “en masses” sur le lit"}, {"ordre": 80, "jalon": 10, "espace": "Linge", "coche": -1, "tache": "Suspendre plier linge propre → penderie"}, {"ordre": 81, "jalon": 9, "espace": "Bureau", "coche": -1, "tache": "Créer sous-parkings Bureau : DS/papiers / Écriture (bloc-notes-pot à crayons) / IT-câbles (1 bac max chacun)"}, {"ordre": 82, "jalon": 9, "espace": "Bureau", "coche": -1, "tache": "(Bureau) Cycle 1 : 10 objets (tout sauf informatique) → dispatch"}, {"ordre": 83, "jalon": 9, "espace": "Bureau", "coche": -1, "tache": "(Bureau) Cycle 2 : 10 objets (tout sauf informatique) → dispatch"}, {"ordre": 84, "jalon": 9, "espace": "Bureau", "coche": -1, "tache": "Regrouper câbles/IT en 1 bac/1 boîte (pas de tri fin) + remettre sur/près du bureau"}, {"ordre": 85, "jalon": 9, "espace": "Bureau", "coche": -1, "tache": "Essuyer surface bureau"}, {"ordre": 86, "jalon": 9, "espace": "Bureau", "coche": -1, "tache": "Remettre uniquement setup + 1 pile “papiers à traiter”"}, {"ordre": 87, "jalon": 9, "espace": "Papiers", "coche": -1, "tache": "Papiers : 3 piles (Administratif / Créatif / À jeter)"}, {"ordre": 88, "jalon": 9, "espace": "Bureau", "coche": -1, "tache": "Vider Panier « parking Bureau »"}, {"ordre": 89, "jalon": 9, "espace": "Papiers", "coche": -1, "tache": "“À jeter” → Déchets/Recyclage immédiat"}, {"ordre": 90, "jalon": 9, "espace": "Papiers", "coche": -1, "tache": "Dégager accès Dossiers Suspendus"}, {"ordre": 91, "jalon": 9, "espace": "Papiers", "coche": -1, "tache": "Transférer papiers/archives à garder dans Meuble Dossier suspendus"}, {"ordre": 92, "jalon": 9, "espace": "Papiers", "coche": -1, "tache": "distinguer papiers à traiter en 2 zones : perso + Mily"}, {"ordre": 93, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "(Arts plastiques) 4 piles : Dessin / Peinture / Lino / Divers"}, {"ordre": 94, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "(Salon—surfaces) Cycle 1 : 10 objets → dispatch"}, {"ordre": 95, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "(Salon—surfaces) Cycle 2 : 10 objets → dispatch"}, {"ordre": 96, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "(Salon—Coffre) Cycle 1 : 10 objets → dispatch"}, {"ordre": 97, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "Essuyer surfaces salon"}, {"ordre": 98, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "Ne remettre que l’essentiel d’usage"}, {"ordre": 99, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "Organiser Couture Crochet Tricot sous la machine à coudre"}, {"ordre": 100, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "Jeter cassé/sec/inutilisable (dispatch direct)"}, {"ordre": 101, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "Stocker par discipline (sans micro-rangement)"}, {"ordre": 102, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "regrouper créa-papeterie vers Coffre de table basse"}, {"ordre": 103, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "Canapé/fauteuil (débarrasser / taper coussins)"}, {"ordre": 104, "jalon": 6, "espace": "Studio", "coche": -1, "tache": "RAFL : vidage 10 min (re-dispatch vers Déchets/Recyclage/Lavomatique/À vendre/rangement)"}, {"ordre": 105, "jalon": 6, "espace": "Studio", "coche": -1, "tache": "Créer 1 coin unique “À vendre” + y déposer seulement les évidents"}, {"ordre": 106, "jalon": 1, "espace": "Sorties", "coche": -1, "tache": "Sortir Poubelles + Trier Rafl (3min)  #4"}, {"ordre": 107, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Créer sous-parkings Bureau : DS/papiers / Écriture / IT-câbles (1 bac max chacun)"}, {"ordre": 108, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "(Salle de bain) Cycle 1 : 10 objets → dispatch (jusqu’au lavabo)"}, {"ordre": 109, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "(Salle de bain) Cycle 2 : 10 objets → dispatch"}, {"ordre": 110, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Appliquer gel WC + timer 10–30 min"}, {"ordre": 111, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Appliquer détartrant + timer selon notice"}, {"ordre": 112, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Jeter déchets évidents"}, {"ordre": 113, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Médicaments : à garder / périmés / à vérifier"}, {"ordre": 114, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Mettre périmés dans sac “retour pharmacie”"}, {"ordre": 115, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Retour timer WC : brosser + rincer"}, {"ordre": 116, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Retour timer détartrant : frotter + rincer"}, {"ordre": 117, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "baignoire : enlever cheveux/vider bonde + spray + brossage rapide + rinçage"}, {"ordre": 118, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Nettoyer lavabo/miroir (rapide)"}, {"ordre": 119, "jalon": 12, "espace": "SDB", "coche": -1, "tache": "Vider Panier « parking SDB » "}, {"ordre": 120, "jalon": 4, "espace": "Circulation", "coche": -1, "tache": "(Sols) Ramasser au sol couloirs+cuisine ce qui bloque l’aspiration → dispatch"}, {"ordre": 121, "jalon": 4, "espace": "Cuisine", "coche": -1, "tache": "(Cuisine—sol / machine à laver) Si la machine à laver gêne : la rouler pour dégager le sol (puis la remettre)"}, {"ordre": 122, "jalon": 4, "espace": "Aspi", "coche": -1, "tache": "Vider Roborock et mettre eau+produit "}, {"ordre": 123, "jalon": 4, "espace": "Aspi", "coche": -1, "tache": "Lancer Roborock couloirs + cuisine"}, {"ordre": 124, "jalon": 4, "espace": "Salon", "coche": -1, "tache": "Pendant Roborock : ramasser au sol salon ce qui bloque → dispatch"}, {"ordre": 125, "jalon": 4, "espace": "Bureau", "coche": -1, "tache": "Pendant Roborock : ramasser au sol bureau ce qui bloque → dispatch"}, {"ordre": 126, "jalon": 4, "espace": "Aspi", "coche": -1, "tache": "Fin Roborock : vider bac / nettoyer serpillère, remettre produit + charge si besoin"}, {"ordre": 127, "jalon": 4, "espace": "Salon", "coche": -1, "tache": "Souffler poussière tapis et sous tapis"}, {"ordre": 128, "jalon": 4, "espace": "Aspi", "coche": -1, "tache": "Lancer Roborock bureau + salon (si sol OK)"}, {"ordre": 129, "jalon": 4, "espace": "Cuisine", "coche": -1, "tache": "Serpillière rapide cuisine si possible"}, {"ordre": 130, "jalon": 4, "espace": "SDB", "coche": -1, "tache": "Serpillière rapide salle de bain si possible"}, {"ordre": 131, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "(Lave-vaisselle) : si fini → vider/ranger ; sinon → noter demain"}, {"ordre": 132, "jalon": 6, "espace": "Studio", "coche": -1, "tache": "Fermer/compacter les 5 piles du SAS (zéro objet hors piles)"}, {"ordre": 133, "jalon": 4, "espace": "Aspi", "coche": -1, "tache": "Fin Roborock : vider bac / nettoyer serpillère, remettre produit + charge si besoin"}, {"ordre": 134, "jalon": 4, "espace": "Aspi", "coche": -1, "tache": "Lancer Roborock chambre + entrée (si sol OK)"}, {"ordre": 135, "jalon": 6, "espace": "Sorties", "coche": -1, "tache": "(Voiture) Descendre : tous sacs Lavomatique + sac “retour pharmacie” + recyclage volumineux (si applicable)"}, {"ordre": 136, "jalon": 1, "espace": "Sorties", "coche": -1, "tache": "Sortir Poubelles + Trier Rafl (3min)  #5 (final?)"}, {"ordre": 137, "jalon": 0, "espace": "Studio", "coche": -1, "tache": "Préparer de quoi s’occuper pendant lavomatique"}, {"ordre": 138, "jalon": 3, "espace": "Cuisine", "coche": -1, "tache": "Faire les vitres"}, {"ordre": 139, "jalon": 11, "espace": "Salon", "coche": -1, "tache": "Faire les vitres"}, {"ordre": 140, "jalon": 12, "espace": "Sdb", "coche": -1, "tache": "Faire les vitres"}, {"ordre": 141, "jalon": 5, "espace": "Sorties", "coche": -1, "tache": "(Fin de session) Partir au Lavomatique (voiture déjà chargée)"}, {"ordre": 142, "jalon": 5, "espace": "Linge", "coche": -1, "tache": "Lancer machines (lavage + séchage)"}, {"ordre": 143, "jalon": 10, "espace": "Chambre", "coche": -1, "tache": "Retour : ranger linge propre “en masses” dans espaces-capacité"}, {"ordre": 144, "jalon": 5, "espace": "Chambre", "coche": -1, "tache": "Retour : refaire le lit (minimum)"}, {"ordre": 145, "jalon": 6, "espace": "Studio", "coche": -1, "tache": "désinfecter/essuyer poignées + interrupteurs (tour rapide)"}], "jalons": {"0": "Préparatifs", "1": "Flux déchets maîtrisé", "2": "Flux linge traité", "3": "Flux Vaisselle OK", "4": "Sols propres", "5": "Flux Linge terminé", "6": "Clôture – Reset", "7": "Circulations rétablies", "8": "Cuisine opérationnelle", "9": "Bureau opérationnel + papiers sécurisés", "10": "Couchage opérationnel", "11": "Salon opérationnel", "12": "SDB opérationnelle", "13": "Entrée opérationnelle", "14": "Studio complètement opérationnel (TOTAL)"}, "rules": ["SAS ≈ 1 m², pas de débordement.", "10 objets max dans la zone en cours → dispatch immédiat : Déchets / Recyclage / Lavomatique / À vendre / RAFL.", "Sac Déchets/Recyclage à 70–80% → sortie immédiate.", "RAFL borné (1 pile) : quand ça monte → vidage 10 min.", "Lavomatique : préparer tôt, charger la voiture au fur et à mesure, y aller en fin de session."], "parkings": [{"name": "Déchets", "kind": "sas", "subs": []}, {"name": "Recyclage", "kind": "sas", "subs": []}, {"name": "Lavomatique", "kind": "sas", "subs": []}, {"name": "À vendre", "kind": "sas", "subs": []}, {"name": "RAFL", "kind": "sas", "subs": ["À redispatch"]}, {"name": "Cuisine", "kind": "parking", "subs": ["Aliments", "Vaisselle", "Appareils"]}, {"name": "SDB", "kind": "parking", "subs": ["Quotidien", "Stock", "Médicaments / retour pharmacie"]}, {"name": "Chambre", "kind": "parking", "subs": ["Linge", "Chevet", "Sous-lit"]}, {"name": "Bureau", "kind": "parking", "subs": ["Papiers / DS", "Écriture", "Informatique / câbles"]}, {"name": "Salon", "kind": "parking", "subs": ["Linogravure", "Dessin", "Peinture", "Couture / Crochet / Tricot", "Résine / Plastique fou", "Encre / Stylos"]}, {"name": "Entrée", "kind": "parking", "subs": ["Prêt-à-sortir", "Manteaux", "Chaussures"]}]}</script>
+<script>
+'use strict';
+const EMBED=JSON.parse(document.getElementById('embedded-data').textContent);
+const KEY='planGrosMenage.local.v3';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const deep=x=>JSON.parse(JSON.stringify(x));
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
+const norm=s=>String(s??'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+let storageOK=true;
+let state;
+
+function fresh(){
+  const tasks=EMBED.tasks.map(t=>({...t,id:uid()}));
+  return {
+    tasks, waits:{}, cursor:Math.min(...tasks.filter(t=>t.coche===0).map(t=>t.ordre)),
+    sas:EMBED.parkings.map(p=>({...p,level:0,subs:p.subs.map(s=>({name:s,level:0}))})),
+    source:EMBED.source, version:3
+  };
+}
+function load(){
+  try{ const raw=localStorage.getItem(KEY); state=raw?JSON.parse(raw):fresh(); }
+  catch(e){ storageOK=false; state=fresh(); }
+  if(!Array.isArray(state.tasks)||!state.tasks.length)state=fresh();
+  state.waits=state.waits||{}; state.sas=state.sas||fresh().sas;
+}
+function save(){
+  try{ localStorage.setItem(KEY,JSON.stringify(state)); storageOK=true; }
+  catch(e){ storageOK=false; }
+  storageMessage();
+}
+function toast(s){const e=$('#toast');e.textContent=s;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),1700)}
+function sortTasks(){state.tasks.sort((a,b)=>Number(a.ordre)-Number(b.ordre))}
+function kind(t){
+ const s=norm(t?.tache);
+ if(/lave.?vaisselle|\blv\b/.test(s))return'LV';
+ if(/roborock|robot aspir/.test(s))return'ROBOROCK';
+ if(/lavomati|laverie/.test(s))return'LAVOMATIQUE';
+ if(/rafl/.test(s))return'RAFL';
+ if(/timer|tremp|degraissant|détartr|detartr|laisser agir/.test(s))return'TIMER / RETOUR';
+ return'';
+}
+function extractMinutes(s){
+ let m=norm(s).match(/(\d{1,3})\s*(?:min|minute)/);if(m)return Number(m[1]);
+ m=norm(s).match(/(\d{1,2})\s*h(?:eure)?(?:\s*(\d{1,2}))?/);if(m)return Number(m[1])*60+Number(m[2]||0);
+ return null;
+}
+function presets(t){const k=kind(t),exact=extractMinutes(t.tache);if(exact)return[exact];if(k==='LV')return[30,60,90,120];if(k==='ROBOROCK')return[20,30,45,60];if(k==='LAVOMATIQUE')return[30,45,60,75];return[5,10,15,30]}
+function current(){
+ sortTasks();
+ let candidates=state.tasks.filter(t=>t.coche===0 && Number(t.ordre)>=Number(state.cursor||0));
+ if(!candidates.length)candidates=state.tasks.filter(t=>t.coche===0);
+ const t=candidates[0]||null;if(t)state.cursor=t.ordre;return t;
+}
+function nextImplicit(after){
+ sortTasks();
+ return state.tasks.find(t=>Number(t.ordre)>Number(after)&&t.coche===-1&&!state.waits[t.id])||null;
+}
+function maybeAutoActivate(after){
+ const anyTodo=state.tasks.find(t=>t.coche===0&&Number(t.ordre)>Number(after));
+ if(anyTodo){state.cursor=anyTodo.ordre;return anyTodo;}
+ const nxt=nextImplicit(after);
+ if(nxt){nxt.coche=0;state.cursor=nxt.ordre;return nxt;}
+ return null;
+}
+function doneCurrent(){
+ const t=current();if(!t)return;t.coche=1;delete state.waits[t.id];
+ const next=maybeAutoActivate(t.ordre);
+ save();renderAll();toast(next?`#${next.ordre} activée`:'Tâche terminée');
+}
+function activeWaits(){
+ const now=Date.now();return state.tasks.filter(t=>t.coche===-1&&state.waits[t.id]).sort((a,b)=>((state.waits[a.id].endsAt||9e15)-(state.waits[b.id].endsAt||9e15)));
+}
+function dueWaits(){const now=Date.now();return activeWaits().filter(t=>{const w=state.waits[t.id];return w.type!=='timer'||(w.endsAt&&w.endsAt<=now)})}
+function fmt(ms){if(ms<=0)return'prêt';let s=Math.ceil(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return h?`${h} h ${String(m).padStart(2,'0')}`:`${m}:${String(ss).padStart(2,'0')}`}
+function resume(id){const t=state.tasks.find(x=>x.id===id);if(!t)return;t.coche=0;delete state.waits[id];state.cursor=t.ordre;save();renderAll();show('focus')}
+function setStatus(id,c){const t=state.tasks.find(x=>x.id===id);if(!t)return;t.coche=c;if(c!==-1)delete state.waits[id];if(c===0)state.cursor=t.ordre;save();renderAll()}
+function showAdj(d){const t=current();if(!t)return;sortTasks();const i=state.tasks.findIndex(x=>x.id===t.id),x=state.tasks[i+d];if(x){state.cursor=x.ordre;if(x.coche!==0)toast(x.coche===1?'Déjà faite':'Waiting');renderFocus(x)}}
+
+function renderFocus(forced=null){
+ const done=state.tasks.filter(t=>t.coche===1).length,total=state.tasks.length,wait=state.tasks.filter(t=>t.coche===-1).length;
+ $('#globalTxt').textContent=`${done} / ${total} faites`;$('#waitingTxt').textContent=`${wait} waiting`;$('#globalBar').style.width=`${done/total*100}%`;
+ const timed=activeWaits().filter(t=>state.waits[t.id].type==='timer'&&state.waits[t.id].endsAt>Date.now());
+ $('#timerStrip').classList.toggle('hidden',!timed.length);$('#timerStrip').innerHTML=timed.map(t=>`<span class="timerpill">#${t.ordre} · ${esc(fmt(state.waits[t.id].endsAt-Date.now()))}</span>`).join('');
+ const t=forced||current();
+ const finished=state.tasks.every(x=>x.coche===1);
+ $('#finishedCard').classList.toggle('hidden',!finished);
+ $('#taskCard').classList.toggle('hidden',finished||!t);
+ const act=$('#activationCard');
+ if(!t&&!finished){
+   const after=Number(state.cursor||0),nxt=nextImplicit(after)||state.tasks.find(x=>x.coche===-1&&!state.waits[x.id]);
+   act.classList.toggle('hidden',!nxt);
+   if(nxt){act.dataset.id=nxt.id;$('#activationText').textContent=`#${nxt.ordre} · ${nxt.tache}`;}
+ } else act.classList.add('hidden');
+ if(!t)return;
+ $('#ord').textContent=`#${t.ordre}`;$('#jal').textContent=`Jalon ${t.jalon}`;$('#space').textContent=t.espace||'—';$('#taskText').textContent=t.tache;
+ const k=kind(t);$('#kind').classList.toggle('hidden',!k);$('#kind').textContent=k;
+ const w=state.waits[t.id];$('#taskWaitInfo').classList.toggle('hidden',!w);if(w)$('#taskWaitInfo').textContent=`En attente : ${w.note||''}${w.type==='timer'?' · '+fmt(w.endsAt-Date.now()):''}`;
+ const same=state.tasks.filter(x=>String(x.jalon)===String(t.jalon)),sd=same.filter(x=>x.coche===1).length;
+ $('#jalonName').textContent=`Jalon ${t.jalon} · ${EMBED.jalons[String(t.jalon)]||''}`;$('#jalonStat').textContent=`${sd}/${same.length}`;$('#jalonBar').style.width=`${same.length?sd/same.length*100:0}%`;
+}
+function renderReturns(){
+ const root=$('#returns');root.innerHTML='';const rows=activeWaits(),now=Date.now();
+ if(!rows.length){root.innerHTML='<div class="card muted">Aucun retour explicite en attente.</div>';return}
+ rows.forEach(t=>{const w=state.waits[t.id],ready=w.type!=='timer'||w.endsAt<=now,el=document.createElement('div');el.className='return '+(ready?'ready':'');
+ el.innerHTML=`<div class="row"><div><div class="plantitle">#${t.ordre} · ${esc(t.tache)}</div><div class="meta">Jalon ${esc(t.jalon)} · ${esc(t.espace)} · ${esc(w.note||'')}</div></div><b>${ready?'PRÊT':esc(fmt(w.endsAt-now))}</b></div><div class="returnactions">${ready?'<button class="btn primary resume">Reprendre</button>':''}<button class="btn ghost finish">Fait</button><button class="btn ghost modify">Modifier attente</button></div>`;
+ if(ready)el.querySelector('.resume').onclick=()=>resume(t.id);el.querySelector('.finish').onclick=()=>setStatus(t.id,1);el.querySelector('.modify').onclick=()=>openWait(t);root.appendChild(el)})
+}
+function renderPlan(){
+ const root=$('#plan');root.innerHTML='';const q=norm($('#search').value),sf=$('#spaceFilter').value,st=$('#statusFilter').value;
+ const spaces=[...new Set(state.tasks.map(t=>t.espace).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fr'));const sel=$('#spaceFilter'),old=sel.value;sel.innerHTML='<option value="">Tous espaces</option>'+spaces.map(s=>`<option>${esc(s)}</option>`).join('');sel.value=spaces.includes(old)?old:'';
+ const rows=state.tasks.slice().sort((a,b)=>a.ordre-b.ordre).filter(t=>(!q||norm(`${t.ordre} ${t.jalon} ${t.espace} ${t.tache}`).includes(q))&&(!sf||t.espace===sf)&&(st===''||String(t.coche)===st));
+ rows.forEach(t=>{const explicit=!!state.waits[t.id],el=document.createElement('div');el.className='planitem';const cls=t.coche===1?'s1':t.coche===0?'s0':'sm1';
+ el.innerHTML=`<div class="planrow"><button class="status ${cls}">${t.coche===1?'✓':t.coche===0?'•':explicit?'⏳':'–'}</button><div class="planbody"><div class="plantitle">${esc(t.tache)}</div><div class="meta">#${t.ordre} · Jalon ${t.jalon} · ${esc(t.espace)}${explicit?' · attente explicite':''}</div></div><div class="planbuttons"><button class="icon edit">✎</button></div></div>`;
+ el.querySelector('.status').onclick=()=>{if(t.coche===-1)resume(t.id);else if(t.coche===0)setStatus(t.id,1);else setStatus(t.id,0)};el.querySelector('.edit').onclick=()=>openEdit(t);root.appendChild(el)})
+}
+function renderSas(){
+ const labels=['Vide','≈ 50 %','≈ 80 %','Plein'],root=$('#sas');root.innerHTML='';
+ state.sas.forEach(p=>{const el=document.createElement('div');el.className='sasitem';el.innerHTML=`<div class="sashead"><div><div class="over">${p.kind==='parking'?'PARKING PAR ESPACE':'SAS'}</div><h3>${esc(p.name)}</h3></div><b>${labels[p.level||0]}</b></div><div class="meter">${labels.map((x,i)=>`<button data-i="${i}" class="${i===p.level?'active '+(i>=2?'warn':''):''}">${x}</button>`).join('')}</div>${p.subs?.length?`<ul class="subs">${p.subs.map((s,i)=>`<li><span>${esc(s.name)}</span><button class="btn small sub" data-i="${i}">${labels[s.level||0]}</button></li>`).join('')}</ul>`:''}`;
+ el.querySelectorAll('.meter button').forEach(b=>b.onclick=()=>{p.level=Number(b.dataset.i);save();renderSas();if(p.level>=2)toast(`${p.name} à ${labels[p.level]}`)});
+ el.querySelectorAll('.sub').forEach(b=>b.onclick=()=>{const s=p.subs[Number(b.dataset.i)];s.level=(s.level+1)%4;save();renderSas()});root.appendChild(el)})
+}
+function updateBadge(){const n=dueWaits().length,b=$('#returnBadge');b.classList.toggle('hidden',!n);b.textContent=`${n} retour${n>1?'s':''} prêt${n>1?'s':''}`}
+function renderRules(){$('#rules').innerHTML=EMBED.rules.map(r=>`<li>${esc(r)}</li>`).join('')}
+function storageMessage(){$('#storageInfo').textContent=storageOK?'Sauvegarde locale disponible dans ce navigateur. Utilise quand même l’export JSON pour une sauvegarde transférable.':'Le navigateur bloque le stockage local pour ce fichier. L’app fonctionne pendant l’ouverture, mais exporte un JSON avant de la fermer pour conserver l’avancement.'}
+function renderAll(){renderFocus();renderReturns();renderPlan();renderSas();updateBadge();storageMessage()}
+
+function openWait(t=current()){
+ if(!t)return;$('#waitDialog').dataset.id=t.id;$('#waitLabel').textContent=`#${t.ordre} · ${t.tache}`;const w=state.waits[t.id];$('#waitType').value=w?.type||'timer';$('#waitNote').value=w?.note||'';$('#minutes').value=w?.minutes||extractMinutes(t.tache)||'';
+ $('#presets').innerHTML=presets(t).map(m=>`<button type="button" data-m="${m}">${m} min</button>`).join('');$$('#presets button').forEach(b=>b.onclick=()=>$('#minutes').value=b.dataset.m);toggleTimer();$('#waitDialog').showModal()
+}
+function toggleTimer(){$('#timerFields').classList.toggle('hidden',$('#waitType').value!=='timer')}
+function confirmWait(){
+ const id=$('#waitDialog').dataset.id,t=state.tasks.find(x=>x.id===id),type=$('#waitType').value,note=$('#waitNote').value.trim();if(!t)return;let minutes=null,endsAt=null;
+ if(type==='timer'){minutes=Number($('#minutes').value);if(!minutes||minutes<1){toast('Indique une durée');return}endsAt=Date.now()+minutes*60000}
+ t.coche=-1;state.waits[id]={type,note:note||(type==='timer'?'Timer / cycle en cours':'À reprendre'),minutes,endsAt};maybeAutoActivate(t.ordre);save();$('#waitDialog').close();renderAll()
+}
+function openEdit(t=null){$('#editTitle').textContent=t?'Modifier la tâche':'Ajouter une tâche';$('#editId').value=t?.id||'';$('#editOrder').value=t?.ordre??(Math.max(...state.tasks.map(x=>Number(x.ordre)||0))+1);$('#editJalon').value=t?.jalon??'';$('#editSpace').value=t?.espace??'';$('#editStatus').value=String(t?.coche??0);$('#editText').value=t?.tache??'';$('#editDialog').showModal()}
+function saveEdit(){
+ const id=$('#editId').value,data={ordre:Number($('#editOrder').value),jalon:Number($('#editJalon').value),espace:$('#editSpace').value.trim(),coche:Number($('#editStatus').value),tache:$('#editText').value.trim()};if(!data.tache)return;
+ if(id)Object.assign(state.tasks.find(x=>x.id===id),data);else state.tasks.push({id:uid(),...data});sortTasks();save();$('#editDialog').close();renderAll()
+}
+function show(v){$$('.view').forEach(x=>x.classList.remove('active'));$$('.tab').forEach(x=>x.classList.remove('active'));$(`#view-${v}`).classList.add('active');$(`.tab[data-v="${v}"]`).classList.add('active');$('#title').textContent={focus:'Exécuter',returns:'Retours',plan:'Plan complet',sas:'SAS & parkings',settings:'Réglages'}[v];if(v==='plan')renderPlan();if(v==='returns')renderReturns();if(v==='sas')renderSas()}
+
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportJson(){download('Plan-Gros-Menage-sauvegarde.json',JSON.stringify(state,null,2),'application/json')}
+function csvCell(v){const s=String(v??'');return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s}
+function exportCsv(){const rows=[['ordre','jalon','espace','coche','tâche'],...state.tasks.slice().sort((a,b)=>a.ordre-b.ordre).map(t=>[t.ordre,t.jalon,t.espace,t.coche,t.tache])];download('Plan-Gros-Menage.csv','\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n'),'text/csv;charset=utf-8')}
+async function importJson(file){if(!file)return;try{const o=JSON.parse(await file.text());if(!Array.isArray(o.tasks))throw Error('Sauvegarde invalide');state=o;save();renderAll();show('focus');toast('Sauvegarde importée')}catch(e){alert(e.message)}}
+
+load();renderRules();renderAll();
+$$('.tab').forEach(b=>b.onclick=()=>show(b.dataset.v));$('#returnBadge').onclick=()=>show('returns');$('#done').onclick=doneCurrent;$('#wait').onclick=()=>openWait();$('#prev').onclick=()=>showAdj(-1);$('#next').onclick=()=>showAdj(1);
+$('#activateBtn').onclick=()=>{const t=state.tasks.find(x=>x.id===$('#activationCard').dataset.id);if(t){t.coche=0;state.cursor=t.ordre;save();renderAll()}};
+$('#waitType').onchange=toggleTimer;$('#confirmWait').onclick=e=>{e.preventDefault();confirmWait()};$('#search').oninput=renderPlan;$('#spaceFilter').onchange=renderPlan;$('#statusFilter').onchange=renderPlan;$('#add').onclick=()=>openEdit();$('#saveEdit').onclick=e=>{e.preventDefault();saveEdit()};
+$('#exportJson').onclick=exportJson;$('#exportCsv').onclick=exportCsv;$('#importJson').onchange=e=>importJson(e.target.files[0]);
+$('#resetEmbedded').onclick=()=>{if(confirm('Revenir au plan intégré et effacer l’avancement local ?')){state=fresh();save();renderAll();show('focus')}};
+$('#resetStatuses').onclick=()=>{if(confirm('Rétablir exactement les coches du classeur fourni ?')){const base=EMBED.tasks;state.tasks.forEach(t=>{const b=base.find(x=>x.ordre===t.ordre);if(b)t.coche=b.coche});state.waits={};state.cursor=Math.min(...state.tasks.filter(t=>t.coche===0).map(t=>t.ordre));save();renderAll();show('focus')}};
+setInterval(()=>{renderFocus();renderReturns();updateBadge()},1000);
+</script>
+</body>
+</html>
